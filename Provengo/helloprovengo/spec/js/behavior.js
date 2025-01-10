@@ -2,15 +2,20 @@
 /* @provengo summon ctrl */
 /* @provengo summon constraints */
 
+
 /**
  * This story responsible for the setup of the tested use cases.
  * It adds an item to the store and registers a user.
  */
 bthread('setup', function () {
   let s = new SeleniumSession('setup admin').start(OpenCartAdminURL)
-  s.adminLogin()
-  s.adminGoToProductsPage()
-  s.adminAddProduct()
+  sync({ request: Ctrl.markEvent('setup start') })
+  sync({ request: Event('Start(adminLogin)') })
+  sync({ waitFor: Event('End(adminLogin)') })
+  sync({ request: Event('Start(adminGoToProductsPage)') })
+  sync({ waitFor: Event('End(adminGoToProductsPage)') })
+  sync({ request: Event('Start(adminAddProduct)') })
+  sync({ waitFor: Event('End(adminAddProduct)') })
   request(Event('setup end'));
 
 })
@@ -21,10 +26,16 @@ bthread('setup', function () {
 bthread('Add item to wishlist', function () {
   waitFor(Event('setup end'));
   let s = new SeleniumSession('user').start(loginURL)
-  s.userLogin()
-  s.userSearchProduct()
+
+
+  sync({ request: Event('Start(userLogin)') })
+  sync({ waitFor: Event('End(userLogin)') })
+  sync({ request: Event('Start(userSearchProduct)') })
+  sync({ waitFor: Event('End(userSearchProduct)') })
   interrupt(any('aboutToDeleteProduct'), function () {
-    s.userAddProductToWishlist()
+
+    sync({ request: Event('Start(userAddProductToWishlist)') })
+    sync({ waitFor: Event('End(userAddProductToWishlist)') })
   })
 })
 
@@ -34,9 +45,12 @@ bthread('Add item to wishlist', function () {
 bthread('Admin deletes an item', function () {
   waitFor(Event('setup end'));
   let s = new SeleniumSession('admin').start(OpenCartAdminURL)
-  s.adminLogin()
-  s.adminGoToProductsPage()
-  s.adminDeleteProduct()
+  sync({ request: Event('Start(adminLogin)') })
+  sync({ waitFor: Event('End(adminLogin)') })
+  sync({ request: Event('Start(adminGoToProductsPage)') })
+  sync({ waitFor: Event('End(adminGoToProductsPage)') })
+  sync({ request: Event('Start(adminDeleteProduct)') })
+  sync({ waitFor: Event('End(adminDeleteProduct)') })
 })
 
 /**
