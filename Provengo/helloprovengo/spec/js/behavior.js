@@ -26,9 +26,9 @@ bthread('Add item to wishlist', function () {
   s.start(loginURL)
   s.userLogin()
   s.userSearchProduct()
-  interrupt(any('aboutToDeleteProduct'), function () {
-    s.userAddProductToWishlist()
-  })
+  s.userAddProductToWishlist()
+
+
 })
 
 /**
@@ -40,6 +40,7 @@ bthread('Admin deletes an item', function () {
   s.start(OpenCartAdminURL)
   s.adminLogin()
   s.adminGoToProductsPage()
+  waitFor
   s.adminDeleteProduct()
 })
 
@@ -47,6 +48,7 @@ bthread('Admin deletes an item', function () {
  * This story responsible to block the option to add an item to wishlist after an admin deleted the product.
  */
 bthread('Block adding to wishlist after removing the item', function () {
+  waitFor(Event('setup_end'));
   sync({waitFor: any('aboutToDeleteProduct')});
   sync({block: any('userAddProductToWishlist')});
 })
@@ -57,26 +59,21 @@ bthread('Block adding to wishlist after removing the item', function () {
 /*
 bthread('domain specific marking', function() {
 
-  const endOfActionES = EventSet("", e => e.name.startsWith("End("));
+//     e = sync({ waitFor: endOfActionES }); // Wait for the next event
+//     iterationCount++; // Increment the iteration counter
+//   }
 
-  let e = sync({ waitFor: endOfActionES });
-  let criticalEvents = ["userSearchProduct", "userAddProductToWishlist", "adminDeleteProduct"];
+//   if (iterationCount >= maxIterations) {
+//     console.error("Infinite loop detected: Terminating bthread. Expected event 'aboutToDeleteProduct' was not encountered.");
+//     return; // Exit the bthread to avoid infinite execution
+//   }
 
-  let criticalEventsOrder = [];
+//   criticalEventsOrder.push("aboutToDeleteProduct"); // Add the final event
 
-  while (e.name !== "End(adminDeleteProduct)") {
-    criticalEvents.forEach(ce => {
-      if (e.name.includes(ce)) {
-        criticalEventsOrder.push(ce);
-      }
-    });
-    e = sync ({waitFor: endOfActionES});
-  }
-  criticalEventsOrder.push("adminDeleteProduct");
+//   let ceo = criticalEventsOrder.join(" -> "); // Create a string representation of the event order
+//   sync({ request: Ctrl.markEvent(ceo) }); // Mark the event sequence
+// });
 
-  let ceo = criticalEventsOrder.join(" -> ");
-  sync({request: Ctrl.markEvent(ceo)});
-})
 
  */
 

@@ -50,7 +50,7 @@ defineAction('adminLogin', function (session) {
 
 defineAction('adminGoToProductsPage', function (session) {
   with (session) {
-    click(xpaths.adminMainWindow.sidebarButton)
+    // click(xpaths.adminMainWindow.sidebarButton)
     click(xpaths.adminMainWindow.catalogButton)
     click(xpaths.adminMainWindow.productsButton)
   }
@@ -75,17 +75,15 @@ defineAction('adminAddProduct', function (session) {
 
 defineAction('adminDeleteProduct', function (session) {
   with (session) {
-    click(xpaths.adminProductListWindow.openFilterButton)
-    writeText(xpaths.adminProductListWindow.productNameInput, productName)
-    click(xpaths.adminProductListWindow.filterButton)
     waitForClickability(xpaths.adminProductListWindow.selectAllProductsButton)
     click(xpaths.adminProductListWindow.selectAllProductsButton)
     waitForClickability(xpaths.adminProductListWindow.deleteProductButton)
-    sync({ request: bp.Event('aboutToDeleteProduct', { session: session }) })
+    sync({ request: bp.Event('aboutToDeleteProduct', { session: session }) }) // Intermediate event
     click(xpaths.adminProductListWindow.deleteProductButton)
-    acceptAlert()
-    //waitForVisibility(xpaths.notification.closeNotificationButton)
-    //click(xpaths.notification.closeNotificationButton)
+    if (isAlertPresent()) {
+      acceptAlert()
+    }
+    sync({ request: bp.Event(`End(aboutToDeleteProduct)`, { session: session }) }) // End event
   }
 })
 
@@ -122,11 +120,23 @@ defineAction('userAddProductToWishlist', function (session) {
   }
 })
 
-function HandleAlert(driver) {
-    try {
-        let alert = driver.switchTo().alert();
-        alert.accept();
-    } catch (e) {
-        // Alert not present - continue
-    }
+function HandleAlert(session) {
+  try {
+      let driver = session.driver; 
+      let alert = driver.switchTo().alert();
+      if (alert) {
+          alert.accept();
+      }
+  } catch (e) {
+      // Alert not present - continue
+  }
+}
+
+function isAlertPresent() {
+  try {
+    let alert = driver.switchTo().alert();
+    return alert !== null;
+  } catch (e) {
+    return false;
+  }
 }
