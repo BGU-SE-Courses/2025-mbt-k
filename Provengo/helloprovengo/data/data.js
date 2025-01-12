@@ -3,9 +3,9 @@
  */
 
 const OpenCartURL = 'http://localhost/opencart';
-const OpenCartAdminURL = 'http://localhost/opencart/admin';
-const registerURL = 'http://localhost/opencart/index.php?route=account/register&language=en-gb';
-const loginURL = 'http://localhost/opencart/index.php?route=account/login&language=en-gb';
+const OpenCartAdminURL = 'http://localhost/opencart/upload/admin';
+const registerURL = 'http://localhost/opencart/upload/index.php?route=account/register&language=en-gb';
+const loginURL = 'http://localhost/opencart/upload/index.php?route=account/login&language=en-gb';
 
 
 const xpaths = {

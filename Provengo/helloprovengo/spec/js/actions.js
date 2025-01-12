@@ -39,12 +39,12 @@ defineAction('registerUser', function (session) {
 
 defineAction('adminLogin', function (session) {
   with (session) {
-    writeText(xpaths.adminLoginWindow.usernameInput, adminUsername)
-    writeText(xpaths.adminLoginWindow.passwordInput, adminPassword)
-    waitForClickability(xpaths.adminLoginWindow.loginButton)
-    click(xpaths.adminLoginWindow.loginButton)
-    waitForVisibility(xpaths.notification.closeNotificationButton)
-    click(xpaths.notification.closeNotificationButton)
+    session.writeText(xpaths.adminLoginWindow.usernameInput, adminUsername)
+    session.writeText(xpaths.adminLoginWindow.passwordInput, adminPassword)
+    session.waitForClickability(xpaths.adminLoginWindow.loginButton)
+    session.click(xpaths.adminLoginWindow.loginButton)
+    session.waitForVisibility(xpaths.notification.closeNotificationButton)
+    session.click(xpaths.notification.closeNotificationButton)
   }
 })
 
@@ -121,3 +121,12 @@ defineAction('userAddProductToWishlist', function (session) {
     click(xpaths.userMainWindow.heartButton)
   }
 })
+
+function HandleAlert(driver) {
+    try {
+        let alert = driver.switchTo().alert();
+        alert.accept();
+    } catch (e) {
+        // Alert not present - continue
+    }
+}
