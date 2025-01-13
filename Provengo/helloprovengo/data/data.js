@@ -65,7 +65,7 @@ const xpaths = {
     filterButton: "//div[1]/div[1]/div[1]/div[2]/div[6]/button[1]",
     selectProductButton: "//tbody[1]/tr[1]/td[1]/input[1]",
     selectAllProductsButton: "//thead[1]/tr[1]/td[1]/input[1]",
-    deleteProductButton: "//button[3]",
+    deleteProductButton: "/html/body/div[1]/div[2]/div[1]/div/div/button[3]/i",
     addProductButton: "//div[1]/div[1]/div[1]/a[1]/i[1]",
     openFilterButton: "//div[1]/div[1]/button[1]"
   },
@@ -83,4 +83,4 @@ const userEmail = 'user@gmail.com'
 const productName = 'product'
 const productTag = 'product'
 const productModel = 'product'
-const productSEO = 'product'
+const productSEO = 'product_test'

@@ -75,14 +75,14 @@ defineAction('adminAddProduct', function (session) {
 
 defineAction('adminDeleteProduct', function (session) {
   with (session) {
+    writeText(xpaths.adminProductListWindow.productNameInput, productName) // filterByProductName(productName)
+    click(xpaths.adminProductListWindow.filterButton)
     waitForClickability(xpaths.adminProductListWindow.selectAllProductsButton)
     click(xpaths.adminProductListWindow.selectAllProductsButton)
     waitForClickability(xpaths.adminProductListWindow.deleteProductButton)
     sync({ request: bp.Event('aboutToDeleteProduct', { session: session }) }) // Intermediate event
     click(xpaths.adminProductListWindow.deleteProductButton)
-    if (isAlertPresent()) {
-      acceptAlert()
-    }
+    HandleAlert(session)
     sync({ request: bp.Event(`End(aboutToDeleteProduct)`, { session: session }) }) // End event
   }
 })

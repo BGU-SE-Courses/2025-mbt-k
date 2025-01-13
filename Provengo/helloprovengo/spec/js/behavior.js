@@ -40,7 +40,6 @@ bthread('Admin deletes an item', function () {
   s.start(OpenCartAdminURL)
   s.adminLogin()
   s.adminGoToProductsPage()
-  waitFor
   s.adminDeleteProduct()
 })
 
