@@ -1,5 +1,5 @@
-# Testing $$*TODO* software name$$ using Provengo
-This directory contains the Provengo project for testing $$*TODO* software name$$.
+# Testing OpenCart using Provengo
+This directory contains the Provengo project for testing OpenCart.
 
 $$*TODO* 
 1. replace the name of the folder 'helloprovengo' with the name of your software (use underscore/title case to avoid spaces)

@@ -2,32 +2,44 @@
 This is a repository for the system-testing assignment of the Software Quality Engineering course at the [Ben-Gurion University](https://in.bgu.ac.il/), Israel.
 
 ## Assignment Description
-In this assignment, we tested an open-source software called [$$*TODO* software name$$](https://address-of-the-project.com).
+In this assignment, we tested an open-source software called [OpenCart](https://www.opencart.com/index.php?route=common/home).
 
 $$*TODO* Add some general description about the software$$
 
 ## Installation
-$$*TODO* Write instructions on how to install the software and prepare the testing environment$$
+1) set up the opencart website on local host using the video on the following link  [How to Install OpenCart](https://www.youtube.com/watch?v=GftTTFm58d8) 
+2) you need to install [Installing the Provengo Tool](https://docs.provengo.tech/ProvengoCli/0.9.5/installation.html) for cucumber  use the files from the project
 
 ## What we tested
-$$*TODO* Add a description of the module and the user stories that you chose to test.
-For example, in the case of the Moodle example, you can write something like this:
+We tested a opencart website . We want to test these user stories:
 
-We tested the quiz module that allows for creating and taking quizzes. We chose to test the following user stories: 
+User Story 1: A user adds a product to their wish list
 
-*User story:* A teacher adds a new quiz to the course with two yes/no questions
+Preconditions:
 
-*Preconditions:* There is a course with a teacher
+1)The user has an active account on the platform.
 
-*Expected outcome:* The quiz is added to the course.
+2)The user is logged into their account.
 
-*User story:* A students attempts a quiz and answers correctly.
+3)The product they wish to add is available in the system.
 
-*Preconditions:* There is a course with a quiz with two yes/no questions and the quiz grade is calculated automatically and the grade is visible to the students upon submission.
+Expected Outcome:
 
-*Expected outcome:* The student receives 100.
-$$
+The selected product is successfully added to the user's wish list.
 
+User Story 2: The administrator removes a product from the platform
+
+Preconditions:
+
+1)The administrator is registered as a system admin.
+
+2)The admin is logged into their admin account.
+
+3)The product intended for removal is currently listed in the system.
+
+Expected Outcome:
+
+The selected product is successfully removed from the system.
 ## How we tested
 We used two different testing methods:
 1. [Cucumber](https://cucumber.io/), a behavior-driven testing framework.
@@ -38,15 +50,3 @@ Each of the testing methods is elaborated in its own directory.
 ## Results
 Update all README.md files (except for d-e, see Section 1). Specifically, replace all $$*TODO*…$$ according to the instructions inside the $$.
 
-## Detected Bugs
-We detected the following bugs:
-
-1. Bug 1: 
-   1. General description: ...
-   2. Steps to reproduce: ...
-   3. Expected result: ...
-   4. Actual result: ...
-   5. Link to the bug report: (you are encouraged to report the bug to the developers of the software)
-2. Bug 2: ...
-
-$$*TODO* if you did not detect the bug, you should delete this section$$  
