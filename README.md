@@ -4,7 +4,15 @@ This is a repository for the system-testing assignment of the Software Quality E
 ## Assignment Description
 In this assignment, we tested an open-source software called [OpenCart](https://www.opencart.com/index.php?route=common/home).
 
-$$*TODO* Add some general description about the software$$
+OpenCart is an open-source e-commerce platform for building and managing online stores. It offers features like multi-store management, customizable themes, payment and shipping integrations, SEO tools, and multilingual support. 
+
+## Key Features
+- **Extensions Marketplace**: Thousands of free and paid plugins.
+- **Custom Themes**: Personalize your store's design.
+- **Global Reach**: Supports multiple currencies and languages.
+- **Analytics & Reports**: Gain insights into sales and customer behavior.
+
+Free to use, scalable, and backed by a strong community, OpenCart is ideal for businesses of all sizes.
 
 ## Installation
 1) set up the opencart website on local host using the video on the following link  [How to Install OpenCart](https://www.youtube.com/watch?v=GftTTFm58d8) 
