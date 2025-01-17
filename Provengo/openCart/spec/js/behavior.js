@@ -28,8 +28,8 @@ bthread('Add item to wishlist', function () {
   s.userSearchProduct()
   s.userAddProductToWishlist()
 
-
 })
+
 
 /**
  * This story responsible for the use case of admin deleting a product for the store
@@ -51,30 +51,6 @@ bthread('Block adding to wishlist after removing the item', function () {
   sync({waitFor: any('aboutToDeleteProduct')});
   sync({block: any('userAddProductToWishlist')});
 })
-
-/**
- * bthread that responsible for marking the critical events in the system for the domain specific marking.
- */
-/*
-bthread('domain specific marking', function() {
-
-//     e = sync({ waitFor: endOfActionES }); // Wait for the next event
-//     iterationCount++; // Increment the iteration counter
-//   }
-
-//   if (iterationCount >= maxIterations) {
-//     console.error("Infinite loop detected: Terminating bthread. Expected event 'aboutToDeleteProduct' was not encountered.");
-//     return; // Exit the bthread to avoid infinite execution
-//   }
-
-//   criticalEventsOrder.push("aboutToDeleteProduct"); // Add the final event
-
-//   let ceo = criticalEventsOrder.join(" -> "); // Create a string representation of the event order
-//   sync({ request: Ctrl.markEvent(ceo) }); // Mark the event sequence
-// });
-
-
- */
 
 /**
  * bthread that responsible for marking the states of the user and admin that were visited during the test.

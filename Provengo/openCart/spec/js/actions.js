@@ -66,7 +66,6 @@ defineAction('adminAddProduct', function (session) {
     click(xpaths.addProductWindow.seoTab)
     writeText(xpaths.addProductWindow.seoInput, productSEO)
     click(xpaths.addProductWindow.saveButton)
-
     //waitForVisibility(xpaths.notification.closeNotificationButton)
     //click(xpaths.notification.closeNotificationButton)
     close()
@@ -75,18 +74,22 @@ defineAction('adminAddProduct', function (session) {
 
 defineAction('adminDeleteProduct', function (session) {
   with (session) {
-    writeText(xpaths.adminProductListWindow.productNameInput, productName) // filterByProductName(productName)
-    click(xpaths.adminProductListWindow.filterButton)
-    waitForClickability(xpaths.adminProductListWindow.selectAllProductsButton)
-    click(xpaths.adminProductListWindow.selectAllProductsButton)
-    waitForClickability(xpaths.adminProductListWindow.deleteProductButton)
-    sync({ request: bp.Event('aboutToDeleteProduct', { session: session }) }) // Intermediate event
-    click(xpaths.adminProductListWindow.deleteProductButton)
-    HandleAlert(session)
-    sync({ request: bp.Event(`End(aboutToDeleteProduct)`, { session: session }) }) // End event
-  }
-})
+    // Filter by product name
+    writeText(xpaths.adminProductListWindow.productNameInput, productName);
+    click(xpaths.adminProductListWindow.filterButton);
+    waitForClickability(xpaths.adminProductListWindow.selectAllProductsButton);
+    click(xpaths.adminProductListWindow.selectAllProductsButton);
+    waitForClickability(xpaths.adminProductListWindow.deleteProductButton);
 
+    // Trigger intermediate event
+    sync({ request: bp.Event('aboutToDeleteProduct', { session: session }) });
+
+    // Click delete button
+    click(xpaths.adminProductListWindow.deleteProductButton);
+
+
+  }
+});
 
 defineAction('adminLogout', function (session) {
   with (session) {
@@ -119,24 +122,3 @@ defineAction('userAddProductToWishlist', function (session) {
     click(xpaths.userMainWindow.heartButton)
   }
 })
-
-function HandleAlert(session) {
-  try {
-      let driver = session.driver; 
-      let alert = driver.switchTo().alert();
-      if (alert) {
-          alert.accept();
-      }
-  } catch (e) {
-      // Alert not present - continue
-  }
-}
-
-function isAlertPresent() {
-  try {
-    let alert = driver.switchTo().alert();
-    return alert !== null;
-  } catch (e) {
-    return false;
-  }
-}

@@ -3,9 +3,9 @@
  */
 
 const OpenCartURL = 'http://localhost/opencart';
-const OpenCartAdminURL = 'http://localhost/opencart/upload/admin';
-const registerURL = 'http://localhost/opencart/upload/index.php?route=account/register&language=en-gb';
-const loginURL = 'http://localhost/opencart/upload/index.php?route=account/login&language=en-gb';
+const OpenCartAdminURL = 'http://localhost/opencart/admin';
+const registerURL = 'http://localhost/opencart/index.php?route=account/register&language=en-gb';
+const loginURL = 'http://localhost/opencart/index.php?route=account/login&language=en-gb';
 
 
 const xpaths = {
@@ -67,7 +67,7 @@ const xpaths = {
     selectAllProductsButton: "//thead[1]/tr[1]/td[1]/input[1]",
     deleteProductButton: "/html/body/div[1]/div[2]/div[1]/div/div/button[3]/i",
     addProductButton: "//div[1]/div[1]/div[1]/a[1]/i[1]",
-    openFilterButton: "//div[1]/div[1]/button[1]"
+    openFilterButton: "//div[1]/div[1]/button[1]",
   },
   notification: {
     closeNotificationButton: "//*[@class='btn-close']"
@@ -75,7 +75,7 @@ const xpaths = {
   }
 }
 const adminUsername = 'admin'
-const adminPassword = 'admin'
+const adminPassword = '123456789'
 const userFirstName = 'user'
 const userLastName = 'user2'
 const userPassword = 'user'

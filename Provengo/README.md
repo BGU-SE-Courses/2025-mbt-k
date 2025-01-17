@@ -13,12 +13,12 @@ provengo run helloprovengo
 ```
 
 ## Tool Documentation
-See [Provengo README](helloprovengo/README.md) for a short description of the tool and how to use it.
+See [Provengo README](openCart/README.md) for a short description of the tool and how to use it.
 
 For a full documentation go to [https://docs.provengo.tech](https://docs.provengo.tech)
 
 ## How we created the test model:
-1. We started by creating the following files: [behavior.js](helloprovengo/spec/js/behavior.js),[actions.js](helloprovengo/spec/js/actions.js), and [data.js](helloprovengo/data/data.js).
+1. We started by creating the following files: [behavior.js](openCart/spec/js/behavior.js),[actions.js](openCart/spec/js/actions.js), and [data.js](openCart/data/data.js).
 2. We then ran the following command to generate the test model:
 ```shell
 provengo analyze -f pdf helloprovengo   
@@ -33,7 +33,7 @@ provengo run --show-sessions helloprovengo
 7. We copied the generated graph of the model to a file named [model.pdf](submission-files/model.pdf) inside the submission-files directory.
 
 ### Test files
-The test data is in [data.js](helloprovengo/data/data.js), the set of possible actions is in [actions.js](helloprovengo/spec/js/actions.js), and the behavior of the system is in [behavior.js](helloprovengo/spec/js/behavior.js).
+The test data is in [data.js](openCart/data/data.js), the set of possible actions is in [actions.js](openCart/spec/js/actions.js), and the behavior of the system is in [behavior.js](openCart/spec/js/behavior.js).
 See the files for a detailed description.
 
 $$*TODO*: Make sure that the text inside the files is informative, self-explanatory, and properly written (meaningful variable names, no magic number, etc.). Specifically, write for each bthread a comment that explain what it does and make sure that the bthread's name reflects its purpose. See the file for an example.$$
@@ -41,17 +41,17 @@ $$*TODO*: Make sure that the text inside the files is informative, self-explanat
 ## How we tested the system
 See the last two lessons of the [Provengo Course](https://provengo.github.io/Course/Online%20Course/0.9.5/index.html) for a detailed explanation of the following steps.
 
-1. We implemented a domain-specific ranking function at the beginning of the [ensemble-code.js](helloprovengo/meta-spec/ensemble-code.js) file and updated the `rankingFunction` to use our function. We added a documentation comment that explains our function.
-2. We sampled the state space of the system using the following command that created a [samples.json](helloprovengo/products/run-source/samples.json) file:
+1. We implemented a domain-specific ranking function at the beginning of the [ensemble-code.js](openCart/meta-spec/ensemble-code.js) file and updated the `rankingFunction` to use our function. We added a documentation comment that explains our function.
+2. We sampled the state space of the system using the following command that created a [samples.json](openCart/products/run-source/samples.json) file:
 ```shell
 provengo sample --overwrite --size 10 helloprovengo
 ```
-3. Given this sample, we created an ensemble (test suite) using the following commands that created an [ensemble.json](helloprovengo/products/run-source/ensemble.json) file:
+3. Given this sample, we created an ensemble (test suite) using the following commands that created an [ensemble.json](openCart/products/run-source/ensemble.json) file:
 ```shell
 provengo ensemble --size 5 helloprovengo
 ```
 4. We repeated the last two steps, changing the two size parameters, until we were satisfied with the grade of the generated test suites.
-5. We copied the [ensemble.json](helloprovengo/products/run-source/ensemble.json) file to [domain-specific.json](submission-files/domain-specific.json).
+5. We copied the [ensemble.json](openCart/products/run-source/ensemble.json) file to [domain-specific.json](submission-files/domain-specific.json).
 6. We visualized the specification, and highlighted the traces in the optimized test suite create by the previous command and copied the output to [domain-specific.pdf](submission-files/domain-specific.pdf).
 ```shell
 provengo analyze -f pdf --highlight products/run-source/ensemble.json helloprovengo
