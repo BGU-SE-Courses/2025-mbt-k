@@ -23,11 +23,11 @@ bthread('setup', function() {
  */
 bthread('Add item to wishlist', function () {
   waitFor(Event('setup_end'));
-  let s = new SeleniumSession('user');
-  s.start(loginURL);
-  s.userLogin();
-  s.userSearchProduct();
-  s.userAddProductToWishlist();
+  let sn = new SeleniumSession('user');
+  sn.start(loginURL);
+  sn.userLogin();
+  sn.userSearchProduct();
+  sn.userAddProductToWishlist();
 });
 
 // Admin deleting a product
@@ -37,11 +37,11 @@ bthread('Add item to wishlist', function () {
  */
 bthread('Admin deletes an item', function () {
   waitFor(Event('setup_end'));
-  let s = new SeleniumSession('admin');
-  s.start(OpenCartAdminURL);
-  s.adminLogin();
-  s.adminGoToProductsPage();
-  s.adminDeleteProduct();
+  let sa = new SeleniumSession('admin');
+  sa.start(OpenCartAdminURL);
+  sa.adminLogin();
+  sa.adminGoToProductsPage();
+  sa.adminDeleteProduct();
 });
 
 // Blocking user from adding to wishlist after product deletion
@@ -55,66 +55,69 @@ bthread('Block adding to wishlist after removing the item', function () {
   sync({block: any('userAddProductToWishlist')});
 });
 
-// Two-way event marking
+// Two-way event tracking and logging
 /**
- * Tracks and logs interactions between admin and user sessions, marking events in a two-way relationship.
- * It monitors session interactions, increments counters for admin and user actions, and generates marks for each interaction.
+ * Monitors interactions between admin and user sessions, tracks session actions,
+ * and logs events to establish a relationship between them.
  */
-bthread('two way marking', function() {
-  waitFor(Event('setup end'));
+bthread('interaction tracker', function() {
+  waitFor(Event('initialization_complete'));
 
-  let marks = []; // Array to store event marks
-  const eventSet = EventSet("", e => true); // Event set that captures all events
-  let e = sync({ waitFor: eventSet });
-  let prevEvent = e; // Tracks the previous event
+  let eventLogs = []; // Array to record event logs
+  const allEvents = EventSet("", evt => true); // Event set capturing all events
+  let currentEvent = sync({ waitFor: allEvents });
+  let previousEvent = currentEvent; // Stores the previous event for comparison
 
-  let admin_count = 0; // Counter for admin actions
-  let user_count = 0; // Counter for user actions
+  let adminActions = 0; // Counter for admin actions
+  let userActions = 0; // Counter for user actions
 
-  // Check if the event is from an admin session and update the counter
-  if (e.session ? e.session : e.data.session.name === 'admin') {
-    admin_count++;
+  // Identify the type of session that generated the first event
+  if (currentEvent.session ? currentEvent.session : currentEvent.data.session.name === 'admin') {
+    adminActions++;
   } else {
-    user_count++;
+    userActions++;
   }
 
-  // Add a maximum iteration count to prevent infinite loops
-  let maxIterations = 100;
-  let iterations = 0;
+  // Define a maximum iteration count to avoid infinite loops
+  const maxLoops = 100;
+  let loopCounter = 0;
 
-  let adminDeleteProduct_flag = false; // Flag to track admin product deletion
-  let userSearchProduct_flag = false; // Flag to track user product search
+  let adminDeleteConfirmed = false; // Flag to confirm admin product deletion
+  let userSearchCompleted = false; // Flag to confirm user product search completion
 
-  // Loop to track events until both admin and user flags are set or iteration limit is reached
-  while ((!adminDeleteProduct_flag || !userSearchProduct_flag) && iterations < maxIterations) {
-    iterations++;
-    e = sync({waitFor: eventSet});
+  // Loop to track events until both flags are true or the loop limit is reached
+  while ((!adminDeleteConfirmed || !userSearchCompleted) && loopCounter < maxLoops) {
+    loopCounter++;
+    currentEvent = sync({waitFor: allEvents});
 
-    // Update flags based on specific events
-    if (e.name === 'End(adminDeleteProduct)')
-      adminDeleteProduct_flag = true;
-
-    if (e.name === 'End(userSearchProduct)')
-      userSearchProduct_flag = true;
-
-    // Determine the current session type and update counters
-    let e_session = e.session ? e.session : e.data.session.name;
-    let prev_session = prevEvent.session ? prevEvent.session : prevEvent.data.session.name;
-
-    if (e_session === 'admin') {
-      admin_count++;
-    } else {
-      user_count++;
+    // Set flags based on specific event names
+    if (currentEvent.name === 'End(adminDeleteProduct)') {
+      adminDeleteConfirmed = true;
     }
 
-    // Create a mark and add it to the marks array
-    marks.push(`${user_count},${admin_count},${prev_session}`);
+    if (currentEvent.name === 'End(userSearchProduct)') {
+      userSearchCompleted = true;
+    }
 
-    prevEvent = e; // Update the previous event
+    // Determine the session type and update respective counters
+    let currentSession = currentEvent.session ? currentEvent.session : currentEvent.data.session.name;
+    let previousSession = previousEvent.session ? previousEvent.session : previousEvent.data.session.name;
+
+    if (currentSession === 'admin') {
+      adminActions++;
+    } else {
+      userActions++;
+    }
+
+    // Log the interaction and store it in the eventLogs array
+    eventLogs.push(`${userActions},${adminActions},${previousSession}`);
+
+    previousEvent = currentEvent; // Update the previous event
   }
 
-  // Send all marks to the controller
-  for (let i = 0; i < marks.length; i++) {
-    sync({request: Ctrl.markEvent(marks[i])});
+  // Send all logged interactions to the controller
+  for (let i = 0; i < eventLogs.length; i++) {
+    sync({request: Ctrl.markEvent(eventLogs[i])});
   }
 });
+
