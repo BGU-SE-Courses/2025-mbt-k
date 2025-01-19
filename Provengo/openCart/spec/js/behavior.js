@@ -2,111 +2,122 @@
 /* @provengo summon ctrl */
 /* @provengo summon constraints */
 
-
+// Initial setup b-thread
 /**
- * This story is responsible for the setup of the tested use cases.
- * It adds an item to the store and registers a user.
+ * Sets up the admin session to log in, navigate to the products page, and add a new product.
+ * This prepares the environment for subsequent b-threads.
  */
 bthread('setup', function() {
-  let s = new SeleniumSession('setup_admin')
-  s.start(OpenCartAdminURL)
-  s.adminLogin()
-  s.adminGoToProductsPage()
-  s.adminAddProduct()
+  let s = new SeleniumSession('setup_admin');
+  s.start(OpenCartAdminURL);
+  s.adminLogin();
+  s.adminGoToProductsPage();
+  s.adminAddProduct();
   request(Event('setup_end'));
+});
 
-})
-
+// User adding an item to the wishlist
 /**
- * This story responsible for the use case of user adding a product to wishlist.
+ * Handles the user workflow of logging in, searching for a product, and adding it to the wishlist.
+ * This b-thread starts after the setup process completes.
  */
 bthread('Add item to wishlist', function () {
   waitFor(Event('setup_end'));
-  let s = new SeleniumSession('user')
-  s.start(loginURL)
-  s.userLogin()
-  s.userSearchProduct()
-  s.userAddProductToWishlist()
+  let sn = new SeleniumSession('user');
+  sn.start(loginURL);
+  sn.userLogin();
+  sn.userSearchProduct();
+  sn.userAddProductToWishlist();
+});
 
-})
-
-
+// Admin deleting a product
 /**
- * This story responsible for the use case of admin deleting a product for the store
+ * Simulates the admin workflow of logging in, navigating to the products page, and deleting a product.
+ * This b-thread starts after the setup process completes.
  */
 bthread('Admin deletes an item', function () {
   waitFor(Event('setup_end'));
-  let s = new SeleniumSession('admin')
-  s.start(OpenCartAdminURL)
-  s.adminLogin()
-  s.adminGoToProductsPage()
-  s.adminDeleteProduct()
-})
+  let sa = new SeleniumSession('admin');
+  sa.start(OpenCartAdminURL);
+  sa.adminLogin();
+  sa.adminGoToProductsPage();
+  sa.adminDeleteProduct();
+});
 
+// Blocking user from adding to wishlist after product deletion
 /**
- * This story responsible to block the option to add an item to wishlist after an admin deleted the product.
+ * Ensures that users cannot add an item to their wishlist after it has been deleted by the admin.
+ * Waits for the admin's product deletion event and then blocks the user action.
  */
 bthread('Block adding to wishlist after removing the item', function () {
   waitFor(Event('setup_end'));
   sync({waitFor: any('aboutToDeleteProduct')});
   sync({block: any('userAddProductToWishlist')});
-})
+});
 
+// Two-way event tracking and logging
 /**
- * bthread that responsible for marking the states of the user and admin that were visited during the test.
- * an example marking is: 1,2,admin
- * 1 - the index of the user event
- * 2 - the index of the admin event
- * admin - the session that the event belongs to (user/admin)
- * this marking means that from user event 1 and admin event 1, the next event was an admin event.
- * therefore recording the edges that were visited during the test.
+ * Monitors interactions between admin and user sessions, tracks session actions,
+ * and logs events to establish a relationship between them.
  */
-bthread('two way marking', function() {
-  waitFor(Event('setup end'));
-  let marks = [];
-  const eventSet = EventSet("", e => true);
-  let e = sync({ waitFor: eventSet });
-  let prevEvent = e;
-  
-  let admin_count = 0;
-  let user_count = 0;
-  
-  if(e.session ? e.session : e.data.session.name === 'admin'){
-    admin_count++;
-  }else{
-    user_count++;
-  }
-  
-  // Add a maximum iteration count to prevent infinite loops
-  let maxIterations = 100;
-  let iterations = 0;
-  
-  let adminDeleteProduct_flag = false;
-  let userSearchProduct_flag = false;
-  while ((!adminDeleteProduct_flag || !userSearchProduct_flag) && iterations < maxIterations) {
-    iterations++;
-    e = sync({waitFor: eventSet});
-    
-    if (e.name === 'End(adminDeleteProduct)')
-      adminDeleteProduct_flag = true;
-      
-    if (e.name === 'End(userSearchProduct)')
-      userSearchProduct_flag = true;
-      
-    let e_session = e.session ? e.session : e.data.session.name;
-    let prev_session = prevEvent.session ? prevEvent.session : prevEvent.data.session.name;
-    
-    if(e_session === 'admin'){
-      admin_count++;
-    }else{
-      user_count++;
-    }
-    marks.push(`${user_count},${admin_count},${prev_session}`);
-    
-    prevEvent = e;
+bthread('interaction tracker', function() {
+  waitFor(Event('initialization_complete'));
+
+  let eventLogs = []; // Array to record event logs
+  const allEvents = EventSet("", evt => true); // Event set capturing all events
+  let currentEvent = sync({ waitFor: allEvents });
+  let previousEvent = currentEvent; // Stores the previous event for comparison
+
+  let adminActions = 0; // Counter for admin actions
+  let userActions = 0; // Counter for user actions
+
+  // Identify the type of session that generated the first event
+  if (currentEvent.session ? currentEvent.session : currentEvent.data.session.name === 'admin') {
+    adminActions++;
+  } else {
+    userActions++;
   }
 
-  for (let i = 0; i < marks.length; i++) {
-    sync({request: Ctrl.markEvent(marks[i])});
+  // Define a maximum iteration count to avoid infinite loops
+  const maxLoops = 100;
+  let loopCounter = 0;
+
+  let adminDeleteConfirmed = false; // Flag to confirm admin product deletion
+  let userSearchCompleted = false; // Flag to confirm user product search completion
+
+  // Loop to track events until both flags are true or the loop limit is reached
+  while ((!adminDeleteConfirmed || !userSearchCompleted) && loopCounter < maxLoops) {
+    loopCounter++;
+    currentEvent = sync({waitFor: allEvents});
+
+    // Set flags based on specific event names
+    if (currentEvent.name === 'End(adminDeleteProduct)') {
+      adminDeleteConfirmed = true;
+    }
+
+    if (currentEvent.name === 'End(userSearchProduct)') {
+      userSearchCompleted = true;
+    }
+
+    // Determine the session type and update respective counters
+    let currentSession = currentEvent.session ? currentEvent.session : currentEvent.data.session.name;
+    let previousSession = previousEvent.session ? previousEvent.session : previousEvent.data.session.name;
+
+    if (currentSession === 'admin') {
+      adminActions++;
+    } else {
+      userActions++;
+    }
+
+    // Log the interaction and store it in the eventLogs array
+    eventLogs.push(`${userActions},${adminActions},${previousSession}`);
+
+    previousEvent = currentEvent; // Update the previous event
   }
-})
+
+  // Send all logged interactions to the controller
+  for (let i = 0; i < eventLogs.length; i++) {
+    sync({request: Ctrl.markEvent(eventLogs[i])});
+  }
+});
+
