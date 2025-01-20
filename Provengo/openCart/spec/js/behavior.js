@@ -14,6 +14,7 @@ bthread('setup', function() {
   s.adminGoToProductsPage();
   s.adminAddProduct();
   request(Event('setup_end'));
+
 });
 
 // User adding an item to the wishlist
@@ -37,12 +38,14 @@ bthread('Add item to wishlist', function () {
  */
 bthread('Admin deletes an item', function () {
   waitFor(Event('setup_end'));
-  let sa = new SeleniumSession('admin');
+  let sa = new SeleniumSession('admin','chrome');
   sa.start(OpenCartAdminURL);
   sa.adminLogin();
   sa.adminGoToProductsPage();
   sa.adminDeleteProduct();
+  sa.acceptAlert(10000);
 });
+
 
 // Blocking user from adding to wishlist after product deletion
 /**

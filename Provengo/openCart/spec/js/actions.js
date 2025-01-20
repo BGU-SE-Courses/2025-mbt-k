@@ -41,7 +41,6 @@ defineAction('registerUser', function (session) {
   session.writeText(xpaths.registerWindow.passwordInput, userPassword);
   session.click(xpaths.registerWindow.agreeCheckbox);
   session.click(xpaths.registerWindow.continueButton);
-  session.close();
 });
 
 /**
@@ -84,7 +83,6 @@ defineAction('adminAddProduct', function (session) {
     click(xpaths.addProductWindow.seoTab);
     writeText(xpaths.addProductWindow.seoInput, productSEO);
     click(xpaths.addProductWindow.saveButton);
-    close();
   }
 });
 
@@ -102,7 +100,9 @@ defineAction('adminDeleteProduct', function (session) {
     // Synchronize on custom "about to delete" event
     sync({ request: bp.Event('aboutToDeleteProduct', { session: session }) });
     click(xpaths.adminProductListWindow.deleteProductButton);
-  }
+    session.waitForVisibility(xpaths.notification.closeNotificationButton);
+    
+  }        
 });
 
 /**
