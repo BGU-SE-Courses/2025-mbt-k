@@ -38,12 +38,12 @@ bthread('Add item to wishlist', function () {
  */
 bthread('Admin deletes an item', function () {
   waitFor(Event('setup_end'));
-  let sa = new SeleniumSession('admin','chrome');
+  let sa = new SeleniumSession('admin_delete_product');
   sa.start(OpenCartAdminURL);
   sa.adminLogin();
   sa.adminGoToProductsPage();
   sa.adminDeleteProduct();
-  sa.acceptAlert(10000);
+  sa.close();
 });
 
 
