@@ -13,6 +13,7 @@ bthread('setup', function() {
   s.adminLogin();
   s.adminGoToProductsPage();
   s.adminAddProduct();
+  s.close();
   request(Event('setup_end'));
 
 });
@@ -29,6 +30,7 @@ bthread('Add item to wishlist', function () {
   sn.userLogin();
   sn.userSearchProduct();
   sn.userAddProductToWishlist();
+  sn.close();
 });
 
 // Admin deleting a product
@@ -38,12 +40,12 @@ bthread('Add item to wishlist', function () {
  */
 bthread('Admin deletes an item', function () {
   waitFor(Event('setup_end'));
-  let sa = new SeleniumSession('admin','chrome');
+  let sa = new SeleniumSession('admin_delete_product');
   sa.start(OpenCartAdminURL);
   sa.adminLogin();
   sa.adminGoToProductsPage();
   sa.adminDeleteProduct();
-  sa.acceptAlert(10000);
+  sa.close();
 });
 
 
@@ -55,7 +57,7 @@ bthread('Admin deletes an item', function () {
 bthread('Block adding to wishlist after removing the item', function () {
   waitFor(Event('setup_end'));
   sync({waitFor: any('aboutToDeleteProduct')});
-  sync({block: any('userAddProductToWishlist')});
+  sync({block: any('Start(userAddProductToWishlist)')});
 });
 
 // Two-way event tracking and logging
