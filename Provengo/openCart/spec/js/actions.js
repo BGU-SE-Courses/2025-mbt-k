@@ -101,8 +101,6 @@ defineAction('adminDeleteProduct', function (session) {
     sync({ request: bp.Event('aboutToDeleteProduct', { session: session }) });
     click(xpaths.adminProductListWindow.deleteProductButton);
     acceptAlert();
-    // Synchronize on custom "product deleted" event
-    sync({ request: bp.Event('productDeleted', { session: session }) });
   }        
 });
 
