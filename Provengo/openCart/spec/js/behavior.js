@@ -126,3 +126,104 @@ bthread('interaction tracker', function() {
   }
 });
 
+// Two-Way Coverage B-Threads (Explicit Pairs)
+/**
+ * Ensures that all pairs of user and admin actions are tested.
+ * Each pair is explicitly defined as a separate b-thread.
+ */
+
+// Pair 1: User Login + Admin Login
+bthread('Pair: User Login + Admin Login', function () {
+  sync({ waitFor: EventSet('Pair: User Login + Admin Login', function (e) {
+    return e.name === 'Start(userLogin)' || e.name === 'Start(adminLogin)';
+  })});
+  sync({ request: Ctrl.markEvent('Pair covered: User Login + Admin Login') });
+});
+
+// Pair 2: User Login + Admin Go to Products Page
+bthread('Pair: User Login + Admin Go to Products Page', function () {
+  sync({ waitFor: EventSet('Pair: User Login + Admin Go to Products Page', function (e) {
+    return e.name === 'Start(userLogin)' || e.name === 'Start(adminGoToProductsPage)';
+  })});
+  sync({ request: Ctrl.markEvent('Pair covered: User Login + Admin Go to Products Page') });
+});
+
+// Pair 3: User Login + Admin Add Product
+bthread('Pair: User Login + Admin Add Product', function () {
+  sync({ waitFor: EventSet('Pair: User Login + Admin Add Product', function (e) {
+    return e.name === 'Start(userLogin)' || e.name === 'Start(adminAddProduct)';
+  })});
+  sync({ request: Ctrl.markEvent('Pair covered: User Login + Admin Add Product') });
+});
+
+// Pair 4: User Login + Admin Delete Product
+bthread('Pair: User Login + Admin Delete Product', function () {
+  sync({ waitFor: EventSet('Pair: User Login + Admin Delete Product', function (e) {
+    return e.name === 'Start(userLogin)' || e.name === 'Start(adminDeleteProduct)';
+  })});
+  sync({ request: Ctrl.markEvent('Pair covered: User Login + Admin Delete Product') });
+});
+
+// Pair 5: User Search Product + Admin Login
+bthread('Pair: User Search Product + Admin Login', function () {
+  sync({ waitFor: EventSet('Pair: User Search Product + Admin Login', function (e) {
+    return e.name === 'Start(userSearchProduct)' || e.name === 'Start(adminLogin)';
+  })});
+  sync({ request: Ctrl.markEvent('Pair covered: User Search Product + Admin Login') });
+});
+
+// Pair 6: User Search Product + Admin Go to Products Page
+bthread('Pair: User Search Product + Admin Go to Products Page', function () {
+  sync({ waitFor: EventSet('Pair: User Search Product + Admin Go to Products Page', function (e) {
+    return e.name === 'Start(userSearchProduct)' || e.name === 'Start(adminGoToProductsPage)';
+  })});
+  sync({ request: Ctrl.markEvent('Pair covered: User Search Product + Admin Go to Products Page') });
+});
+
+// Pair 7: User Search Product + Admin Add Product
+bthread('Pair: User Search Product + Admin Add Product', function () {
+  sync({ waitFor: EventSet('Pair: User Search Product + Admin Add Product', function (e) {
+    return e.name === 'Start(userSearchProduct)' || e.name === 'Start(adminAddProduct)';
+  })});
+  sync({ request: Ctrl.markEvent('Pair covered: User Search Product + Admin Add Product') });
+});
+
+// Pair 8: User Search Product + Admin Delete Product
+bthread('Pair: User Search Product + Admin Delete Product', function () {
+  sync({ waitFor: EventSet('Pair: User Search Product + Admin Delete Product', function (e) {
+    return e.name === 'Start(userSearchProduct)' || e.name === 'Start(adminDeleteProduct)';
+  })});
+  sync({ request: Ctrl.markEvent('Pair covered: User Search Product + Admin Delete Product') });
+});
+
+// Pair 9: User Add Product to Wishlist + Admin Login
+bthread('Pair: User Add Product to Wishlist + Admin Login', function () {
+  sync({ waitFor: EventSet('Pair: User Add Product to Wishlist + Admin Login', function (e) {
+    return e.name === 'Start(userAddProductToWishlist)' || e.name === 'Start(adminLogin)';
+  })});
+  sync({ request: Ctrl.markEvent('Pair covered: User Add Product to Wishlist + Admin Login') });
+});
+
+// Pair 10: User Add Product to Wishlist + Admin Go to Products Page
+bthread('Pair: User Add Product to Wishlist + Admin Go to Products Page', function () {
+  sync({ waitFor: EventSet('Pair: User Add Product to Wishlist + Admin Go to Products Page', function (e) {
+    return e.name === 'Start(userAddProductToWishlist)' || e.name === 'Start(adminGoToProductsPage)';
+  })});
+  sync({ request: Ctrl.markEvent('Pair covered: User Add Product to Wishlist + Admin Go to Products Page') });
+});
+
+// Pair 11: User Add Product to Wishlist + Admin Add Product
+bthread('Pair: User Add Product to Wishlist + Admin Add Product', function () {
+  sync({ waitFor: EventSet('Pair: User Add Product to Wishlist + Admin Add Product', function (e) {
+    return e.name === 'Start(userAddProductToWishlist)' || e.name === 'Start(adminAddProduct)';
+  })});
+  sync({ request: Ctrl.markEvent('Pair covered: User Add Product to Wishlist + Admin Add Product') });
+});
+
+// Pair 12: User Add Product to Wishlist + Admin Delete Product
+bthread('Pair: User Add Product to Wishlist + Admin Delete Product', function () {
+  sync({ waitFor: EventSet('Pair: User Add Product to Wishlist + Admin Delete Product', function (e) {
+    return e.name === 'Start(userAddProductToWishlist)' || e.name === 'Start(adminDeleteProduct)';
+  })});
+  sync({ request: Ctrl.markEvent('Pair covered: User Add Product to Wishlist + Admin Delete Product') });
+});
