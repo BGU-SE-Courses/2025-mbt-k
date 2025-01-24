@@ -2,9 +2,7 @@
  *  This is a good place to put common test data, project-wide constants, etc.
  */
 
-const OpenCartURL = 'http://localhost/opencart';
 const OpenCartAdminURL = 'http://localhost/opencart/admin';
-const registerURL = 'http://localhost/opencart/index.php?route=account/register&language=en-gb';
 const loginURL = 'http://localhost/opencart/index.php?route=account/login&language=en-gb';
 
 
