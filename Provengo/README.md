@@ -53,7 +53,7 @@ See the last two lessons of the [Provengo Course](https://provengo.github.io/Cou
 5. We copied the [ensemble.json](submission-files/domain-specific.json) file to [domain-specific.json](submission-files/domain-specific.json).
 6. We visualized the specification, and highlighted the traces in the optimized test suite create by the previous command and copied the output to [domain-specific.pdf](submission-files/domain-specific.pdf).
 ```shell
- java -jar /Users/hsenhsnen/Downloads/Provengo.uber-3.jar  analyze -f pdf --highlight products/run-source/ensemble.json openCart
+ java -jar /Users/hsenhsnen/Downloads/Provengo.uber-3.jar  analyze -f pdf --highlight  products/run-source/ensemble.json --max-depth 100 openCart
 ```
 7. We ran the generated test suites using the following command:
 ```shell

@@ -35,6 +35,7 @@ defineAction = function (name, func) {
  * @param {SeleniumSession} session - The Selenium session object.
  */
 defineAction('registerUser', function (session) {
+  session.waitForVisibility(xpaths.registerWindow.firstNameInput);
   session.writeText(xpaths.registerWindow.firstNameInput, userFirstName);
   session.writeText(xpaths.registerWindow.lastNameInput, userLastName);
   session.writeText(xpaths.registerWindow.emailInput, userEmail);
@@ -49,6 +50,7 @@ defineAction('registerUser', function (session) {
  */
 defineAction('adminLogin', function (session) {
   with (session) {
+    session.waitForVisibility(xpaths.adminLoginWindow.usernameInput);
     session.writeText(xpaths.adminLoginWindow.usernameInput, adminUsername);
     session.writeText(xpaths.adminLoginWindow.passwordInput, adminPassword);
     session.waitForClickability(xpaths.adminLoginWindow.loginButton);
