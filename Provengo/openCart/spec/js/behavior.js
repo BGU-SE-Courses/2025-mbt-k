@@ -15,7 +15,6 @@ bthread('setup', function() {
   s.adminAddProduct();
   s.close();
   request(Event('setup_end'));
-
 });
 
 // User adding an item to the wishlist
@@ -31,6 +30,7 @@ bthread('Add item to wishlist', function () {
   sn.userSearchProduct();
   sn.userAddProductToWishlist();
   sn.close();
+  request(Event('product_added_to_wishlist'));
 });
 
 // Admin deleting a product
@@ -46,6 +46,7 @@ bthread('Admin deletes an item', function () {
   sa.adminGoToProductsPage();
   sa.adminDeleteProduct();
   sa.close();
+  request(Event('product_deleted'));
 });
 
 
