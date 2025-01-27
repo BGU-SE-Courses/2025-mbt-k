@@ -4,9 +4,9 @@
  * List of events "of interest" that we want test suites to cover.
  */
 const GOALS = [
-    any(/Howdy/),
-    any(/Mars/),
-    Ctrl.markEvent("Classic!")
+    Event('product_added_to_wishlist'),
+    Event('product_deleted'),
+    Event("setup_end")
 ];
 
 const makeGoals = function(){
