@@ -3,17 +3,43 @@
 /**
  * List of events "of interest" that we want test suites to cover.
  */
-const GOALS = [
-    any(/Howdy/),
-    any(/Mars/),
-    Ctrl.markEvent("Classic!")
+const domain = [
+    Event('setup_end'),
+    Event('aboutToDeleteProduct'),
+    Event('Start(adminLogin)'),
+    Event('End(adminLogin)'),
+    Event('Start(adminAddProduct)'),
+    Event('End(adminAddProduct)'),
+    Event('Start(adminDeleteProduct)'),
+    Event('End(adminDeleteProduct)'),
+    Event('Start(userLogin)'),
+    Event('End(userLogin)'),
+    Event('Start(userSearchProduct)'),
+    Event('End(userSearchProduct)'),
+    Event('Start(userAddProductToWishlist)'),
+    Event('End(userAddProductToWishlist)'),
 ];
 
-const makeGoals = function(){
-    return [ [ any(/Howdy/), any(/Venus/) ],
-             [ any(/Mars/) ],
-             [ Ctrl.markEvent("Classic!") ] ];
-}
+const  two_way = function () {
+    return [
+        {
+            event1: Event('aboutToDeleteProduct'),
+            event2: Event('Start(userAddProductToWishlist)'),
+            relation: 'blocks'
+        },
+        {
+            event1: Event('setup_end'),
+            event2: Event('Start(userLogin)'),
+            relation: 'enables'
+        },
+        {
+            event1: Event('setup_end'),
+            event2: Event('Start(adminLogin)'),
+            relation: 'enables'
+        }
+    ];
+};
+
 
 /**
  * Ranks test suites by how many events from the GOALS array were met.
@@ -26,8 +52,8 @@ const makeGoals = function(){
  */
 function rankByMetGoals( ensemble ) {
     const unreachedGoals = [];
-    for ( let idx=0; idx<GOALS.length; idx++ ) {
-        unreachedGoals.push(GOALS[idx]);
+    for ( let idx=0; idx< domain.length; idx++ ) {
+        unreachedGoals.push(domain[idx]);
     }
 
     for (let testIdx = 0; testIdx < ensemble.length; testIdx++) {
@@ -43,7 +69,7 @@ function rankByMetGoals( ensemble ) {
         }
     }
 
-    return GOALS.length-unreachedGoals.length;
+    return domain.length-unreachedGoals.length;
 }
 
 /**
@@ -59,12 +85,12 @@ function rankByMetGoals( ensemble ) {
  * @returns the percentage of goals covered by `ensemble`.
  */
  function rankingFunction(ensemble) {
-    
+
     // How many goals did `ensemble` hit?
     const metGoalsCount = rankByMetGoals(ensemble);
     // What percentage of the goals did `ensemble` cover?
-    const metGoalsPercent = metGoalsCount/GOALS.length;
-
+    const metGoalsPercent = metGoalsCount/domain.length;
     return metGoalsPercent * 100; // convert to human-readable percentage
-}
+
+ }
 
