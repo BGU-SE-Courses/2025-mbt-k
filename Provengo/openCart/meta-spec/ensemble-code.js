@@ -5,26 +5,20 @@
  */
 const domain = [
     Event('setup_end'),
-    Event('aboutToDeleteProduct'),
-    Event('Start(adminLogin)'),
-    Event('End(adminLogin)'),
-    Event('Start(adminAddProduct)'),
-    Event('End(adminAddProduct)'),
-    Event('Start(adminDeleteProduct)'),
-    Event('End(adminDeleteProduct)'),
-    Event('Start(userLogin)'),
-    Event('End(userLogin)'),
-    Event('Start(userSearchProduct)'),
-    Event('End(userSearchProduct)'),
-    Event('Start(userAddProductToWishlist)'),
-    Event('End(userAddProductToWishlist)'),
+    Event('ProductAddedToWishlist'),
+    Event('product_deleted'),
+    Event('AdminLoggedIn'),
+    Event('AdminProductsPage'),
+    Event('ProductAdded'),
+    Event('UserLoggedIn'),
+    Event('ProductSearched'),
+    Event('ProductAddedToWishlist'),  
 ];
 
 /**
  * Creates two-way relationships for domain events
  */
-const two_way = function () {
-    return [
+const twoWayGoals =[
         // Event relationships within user flow
         { event1: Event('setup_end'), event2: Event('Start(userLogin)'), relation: 'enables' },
         { event1: Event('End(userLogin)'), event2: Event('Start(userSearchProduct)'), relation: 'enables' },
@@ -40,7 +34,6 @@ const two_way = function () {
         { event1: Event('End(userSearchProduct)'), event2: Event('Start(adminLogin)'), relation: 'enables' },
         { event1: Event('aboutToDeleteProduct'), event2: Event('Start(adminDeleteProduct)'), relation: 'blocks' },
     ];
-};
 
 /**
  * Creates goals for two-way testing coverage
@@ -82,58 +75,58 @@ const makeGoals = function () {
  */
 function rankByMetGoals(ensemble) {
     const unreachedGoals = [];
-    const twoWayGoals = two_way(); // Get the two-way relationship goals
-
-    // Initialize the unreached goals with all the two-way relationships
-    for (let idx = 0; idx < twoWayGoals.length; idx++) {
-        unreachedGoals.push(twoWayGoals[idx]);  // Add all two-way goals to the unreached list
-    }
+    for ( let idx=0; idx< twoWayGoals.length; idx++ ) {
+                unreachedGoals.push(twoWayGoals[idx]);
+            }
 
     // Loop through the test suite (ensemble)
     for (let testIdx = 0; testIdx < ensemble.length; testIdx++) {
         let test = ensemble[testIdx];
 
-        // Check each event in the test
-        for (let eventIdx = 0; eventIdx < test.length; eventIdx++) {
-            let event = test[eventIdx];
+        // Check for every unreached goal
+        for (let goalIdx = unreachedGoals.length - 1; goalIdx >= 0; goalIdx--) {
+            const unreachedGoal = unreachedGoals[goalIdx];
+            let event1Found = false;
+            let event2Found = false;
 
-            // Loop through the unreached goals and check if any are satisfied by the event
-            for (let ugIdx = unreachedGoals.length - 1; ugIdx >= 0; ugIdx--) {
-                let unreachedGoal = unreachedGoals[ugIdx];
+            // Traverse the events in the current test
+            for (let eventIdx = 0; eventIdx < test.length; eventIdx++) {
+                const event = test[eventIdx];
 
-                // Check if the event satisfies the unreached goal
-                if (unreachedGoal.event1 === event || unreachedGoal.event2 === event) {
-                    // If the event satisfies the goal, remove the goal from the list
-                    unreachedGoals.splice(ugIdx, 1);
+                // Check if the event matches `event1` or `event2` of the goal
+                if (event.equals(unreachedGoal.event1)) {
+                    event1Found = true;
                 }
+                if (event.equals(unreachedGoal.event2) && event1Found) {
+                    event2Found = true;
+                    break; // If both are satisfied, stop searching
+                }
+            }
+
+            // If the goal is met (event1 before event2), remove it from unreachedGoals
+            if (event1Found && event2Found) {
+                unreachedGoals.splice(goalIdx, 1);
             }
         }
     }
 
-    // Return the number of goals that were met (i.e., the number of goals not in unreachedGoals)
+    // Return the number of goals met
     return twoWayGoals.length - unreachedGoals.length;
 }
 
-/**
- * Ranks test suites based on the percentage of goals they cover.
- * Goal events are defined in the two_way() array above. An ensemble with rank
- * 100 covers all the goal events.
- *
- * @param {Event[][]} ensemble the test suite/ensemble to be ranked
- * @returns the percentage of goals covered by `ensemble`.
- */
-function rankingFunction(ensemble) {
-    // How many two-way goals did `ensemble` hit?
+//  * @param {Event[][]} ensemble the test suite/ensemble to be ranked
+//  * @returns the percentage of goals covered by `ensemble`.
+//  */
+ function rankingFunction(ensemble) {
+
+    // How many goals did `ensemble` hit?
     const metGoalsCount = rankByMetGoals(ensemble);
-
     // What percentage of the goals did `ensemble` cover?
-    const metGoalsPercent = metGoalsCount / two_way().length;
+    const metGoalsPercent = metGoalsCount/tw.length;
+    return metGoalsPercent * 100; // convert to human-readable percentage
+ }
 
-    // Convert to human-readable percentage
-    return metGoalsPercent * 100;
-}
 
-//
 // /**
 //  * Ranks test suites by how many events from the GOALS array were met.
 //  * The more goals are met, the higher the score.
@@ -148,7 +141,7 @@ function rankingFunction(ensemble) {
 //     for ( let idx=0; idx< domain.length; idx++ ) {
 //         unreachedGoals.push(domain[idx]);
 //     }
-//
+
 //     for (let testIdx = 0; testIdx < ensemble.length; testIdx++) {
 //         let test = ensemble[testIdx];
 //         for (let eventIdx = 0; eventIdx < test.length; eventIdx++) {
@@ -161,10 +154,10 @@ function rankingFunction(ensemble) {
 //             }
 //         }
 //     }
-//
+
 //     return domain.length-unreachedGoals.length;
 // }
-//
+
 // /**
 //  * Ranks potential test suites based on the percentage of goals they cover.
 //  * Goal events are defined in the GOALS array above. An ensemble with rank
@@ -178,7 +171,7 @@ function rankingFunction(ensemble) {
 //  * @returns the percentage of goals covered by `ensemble`.
 //  */
 //  function rankingFunction(ensemble) {
-//
+
 //     // How many goals did `ensemble` hit?
 //     const metGoalsCount = rankByMetGoals(ensemble);
 //     // What percentage of the goals did `ensemble` cover?

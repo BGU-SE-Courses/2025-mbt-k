@@ -42,6 +42,7 @@ defineAction('registerUser', function (session) {
   session.writeText(xpaths.registerWindow.passwordInput, userPassword);
   session.click(xpaths.registerWindow.agreeCheckbox);
   session.click(xpaths.registerWindow.continueButton);
+  request(Event('UserRegistered'));
 });
 
 /**
@@ -57,6 +58,7 @@ defineAction('adminLogin', function (session) {
     session.click(xpaths.adminLoginWindow.loginButton);
     session.waitForVisibility(xpaths.notification.closeNotificationButton);
     session.click(xpaths.notification.closeNotificationButton);
+    request(Event('AdminLoggedIn'));
   }
 });
 
@@ -68,6 +70,7 @@ defineAction('adminGoToProductsPage', function (session) {
   with (session) {
     click(xpaths.adminMainWindow.catalogButton);
     click(xpaths.adminMainWindow.productsButton);
+    request(Event('AdminProductsPage'));
   }
 });
 
@@ -85,6 +88,7 @@ defineAction('adminAddProduct', function (session) {
     click(xpaths.addProductWindow.seoTab);
     writeText(xpaths.addProductWindow.seoInput, productSEO);
     click(xpaths.addProductWindow.saveButton);
+    request(Event('ProductAdded'));
   }
 });
 
@@ -103,6 +107,7 @@ defineAction('adminDeleteProduct', function (session) {
     sync({ request: bp.Event('aboutToDeleteProduct', { session: session }) });
     click(xpaths.adminProductListWindow.deleteProductButton);
     acceptAlert();
+    request(Event('product_deleted'));
   }        
 });
 
@@ -126,6 +131,7 @@ defineAction('userLogin', function (session) {
     writeText(xpaths.loginWindow.passwordInput, userPassword);
     click(xpaths.loginWindow.loginButton);
   }
+  request(Event('UserLoggedIn'));
 });
 
 /**
@@ -139,6 +145,7 @@ defineAction('userSearchProduct', function (session) {
     writeText(xpaths.userMainWindow.searchInput, productName);
     click(xpaths.userMainWindow.searchButton);
   }
+  request(Event('ProductSearched'));
 });
 
 /**
@@ -151,4 +158,5 @@ defineAction('userAddProductToWishlist', function (session) {
     waitForClickability(xpaths.userMainWindow.heartButton);
     click(xpaths.userMainWindow.heartButton);
   }
+  request(Event('ProductAddedToWishlist'));
 });
