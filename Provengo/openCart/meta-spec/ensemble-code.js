@@ -1,9 +1,40 @@
 // @provengo summon ctrl
 
+//  Two way coverage : openCart
 /**
- * List of events "of interest" that we want test suites to cover.
+ * Generates pairs of events for two-way coverage while excluding blocked pairs.
+ * This ensures both single events and valid sequences are tested.
  */
-const domain = [
+const generateFilteredTwoWayCoverage = (events, blockedPairs) => {
+    const pairs = [];
+    for (let i = 0; i < events.length; i++) {
+        for (let j = 0; j < events.length; j++) {
+            const pair = [events[i], events[j]];
+            if (!isBlockedPair(pair, blockedPairs)) {
+                pairs.push(pair);
+            }
+        }
+    }
+    return pairs;
+};
+
+/**
+ * Checks if a given event pair is in the list of blocked pairs.
+ * @param {Array} pair The event pair to check.
+ * @param {Array} blockedPairs The list of blocked pairs.
+ * @returns {boolean} True if the pair is blocked, false otherwise.
+ */
+const isBlockedPair = (pair, blockedPairs) => {
+    return blockedPairs.some(
+        blockedPair =>
+            JSON.stringify(pair) === JSON.stringify(blockedPair)
+    );
+};
+
+/**
+ * List of events of interest.
+ */
+const events = [
     Event('setup_end'),
     Event('ProductAddedToWishlist'),
     Event('product_deleted'),
@@ -12,120 +43,96 @@ const domain = [
     Event('ProductAdded'),
     Event('UserLoggedIn'),
     Event('ProductSearched'),
-    Event('ProductAddedToWishlist'),  
 ];
 
 /**
- * Creates two-way relationships for domain events
+ * List of blocked pairs that do not make sense in the system.
  */
-const twoWayGoals =[
-        // Event relationships within user flow
-        { event1: Event('setup_end'), event2: Event('Start(userLogin)'), relation: 'enables' },
-        { event1: Event('End(userLogin)'), event2: Event('Start(userSearchProduct)'), relation: 'enables' },
-        { event1: Event('End(userSearchProduct)'), event2: Event('Start(userAddProductToWishlist)'), relation: 'enables' },
-        { event1: Event('aboutToDeleteProduct'), event2: Event('Start(userAddProductToWishlist)'), relation: 'blocks' },
+const blockedPairs = [
+    // Admin-related actions
+    [Event('AdminLoggedIn'), Event('ProductAddedToWishlist')], // Admin shouldn't add products to the wishlist
+    // Setup-related sequences
+    [Event('setup_end'), Event('ProductAddedToWishlist')], // Same as above for wishlist addition
+    [Event('setup_end'), Event('ProductSearched')], // Searching for products should happen after setup ends
 
-        // Event relationships within admin flow
-        { event1: Event('setup_end'), event2: Event('Start(adminLogin)'), relation: 'enables' },
-        { event1: Event('End(adminLogin)'), event2: Event('Start(adminAddProduct)'), relation: 'enables' },
-        { event1: Event('End(adminAddProduct)'), event2: Event('Start(adminDeleteProduct)'), relation: 'enables' },
+    // User actions that conflict with setup or admin actions
+    [Event('UserLoggedIn'), Event('setup_end')], // User login after setup ends, setup should be first
+    [Event('ProductAddedToWishlist'), Event('ProductDeleted')], // A product shouldn't be added to a wishlist if it's deleted
 
-        // Cross-flow relationships (User-Admin interactions)
-        { event1: Event('End(userSearchProduct)'), event2: Event('Start(adminLogin)'), relation: 'enables' },
-        { event1: Event('aboutToDeleteProduct'), event2: Event('Start(adminDeleteProduct)'), relation: 'blocks' },
-    ];
+    // Product action conflicts
+    [Event('ProductAddedToWishlist'), Event('product_deleted')], // Adding a product to a wishlist and deleting it might be contradictory
+    [Event('ProductAdded'), Event('ProductSearched')], // Adding a product and searching for it in the same sequence may not make sense
+    
+    // Invalid transitions
+    [Event('ProductAdded'), Event('AdminProductsPage')], // Admin viewing the products page before products are added
+    [Event('ProductSearched'), Event('AdminProductsPage')], // Admin should be on the products page only after a search or directly via admin actions
+    [Event('AdminProductsPage'), Event('setup_end')], // Admin shouldn't access products page before setup ends
+
+    // Rare edge cases
+    [Event('UserLoggedIn'), Event('setup_end')], // User login might happen only after setup is completed
+    [Event('ProductSearched'), Event('UserLoggedIn')], // User searches before logging in
+    [Event('ProductDeleted'), Event('UserLoggedIn')], // User logged in after a product deletion might conflict with the user's session
+];
 
 /**
- * Creates goals for two-way testing coverage
+ * Two-way coverage pairs: All valid pairs of events, excluding blocked ones.
  */
-const makeGoals = function () {
-    return [
-        // User flow pairs
-        [any(/Start\(userLogin\)/), any(/End\(userLogin\)/)],
-        [any(/End\(userLogin\)/), any(/Start\(userSearchProduct\)/)],
-        [any(/Start\(userSearchProduct\)/), any(/End\(userSearchProduct\)/)],
-        [any(/End\(userSearchProduct\)/), any(/Start\(userAddProductToWishlist\)/)],
-        [any(/Start\(userAddProductToWishlist\)/), any(/End\(userAddProductToWishlist\)/)],
-
-        // Admin flow pairs
-        [any(/Start\(adminLogin\)/), any(/End\(adminLogin\)/)],
-        [any(/End\(adminLogin\)/), any(/Start\(adminAddProduct\)/)],
-        [any(/Start\(adminAddProduct\)/), any(/End\(adminAddProduct\)/)],
-        [any(/End\(adminAddProduct\)/), any(/Start\(adminDeleteProduct\)/)],
-        [any(/Start\(adminDeleteProduct\)/), any(/End\(adminDeleteProduct\)/)],
-
-        // Cross-flow pairs (User-Admin interactions)
-        [any(/End\(userSearchProduct\)/), any(/Start\(adminLogin\)/)],
-        [any(/aboutToDeleteProduct/), any(/Start\(userAddProductToWishlist\)/)],
-        [any(/aboutToDeleteProduct/), any(/Start\(adminDeleteProduct\)/)]
-    ];
-};
+const twoWayPairs = generateFilteredTwoWayCoverage(events, blockedPairs);
 
 /**
- * two way functions
- */
-
-/**
- * Ranks test suites by how many events from the GOALS array were met.
- * The more goals are met, the higher the score.
- * It makes no difference if a goal was met more than once.
+ * Ranks a test suite by how many two-way event pairs it covers, considering blocked pairs.
  *
  * @param {Event[][]} ensemble The test suite to be ranked.
- * @returns Number of events from GOALS that have been met.
+ * @returns The percentage of two-way pairs covered by the test suite.
  */
-function rankByMetGoals(ensemble) {
-    const unreachedGoals = [];
-    for ( let idx=0; idx< twoWayGoals.length; idx++ ) {
-                unreachedGoals.push(twoWayGoals[idx]);
-            }
+function rankByTwoWayCoverage(ensemble) {
+    const uncoveredPairs = new Set(twoWayPairs.map(pair => JSON.stringify(pair)));
 
-    // Loop through the test suite (ensemble)
     for (let testIdx = 0; testIdx < ensemble.length; testIdx++) {
         let test = ensemble[testIdx];
-
-        // Check for every unreached goal
-        for (let goalIdx = unreachedGoals.length - 1; goalIdx >= 0; goalIdx--) {
-            const unreachedGoal = unreachedGoals[goalIdx];
-            let event1Found = false;
-            let event2Found = false;
-
-            // Traverse the events in the current test
-            for (let eventIdx = 0; eventIdx < test.length; eventIdx++) {
-                const event = test[eventIdx];
-
-                // Check if the event matches `event1` or `event2` of the goal
-                if (event.equals(unreachedGoal.event1)) {
-                    event1Found = true;
-                }
-                if (event.equals(unreachedGoal.event2) && event1Found) {
-                    event2Found = true;
-                    break; // If both are satisfied, stop searching
-                }
-            }
-
-            // If the goal is met (event1 before event2), remove it from unreachedGoals
-            if (event1Found && event2Found) {
-                unreachedGoals.splice(goalIdx, 1);
+        for (let eventIdx = 0; eventIdx < test.length - 1; eventIdx++) {
+            let pair = [test[eventIdx], test[eventIdx + 1]];
+            let pairString = JSON.stringify(pair);
+            if (uncoveredPairs.has(pairString)) {
+                uncoveredPairs.delete(pairString);
             }
         }
     }
 
-    // Return the number of goals met
-    return twoWayGoals.length - unreachedGoals.length;
+    const totalPairs = twoWayPairs.length;
+    const coveredPairs = totalPairs - uncoveredPairs.size;
+    return (coveredPairs / totalPairs) * 100; // percentage of two-way pairs covered
 }
 
-//  * @param {Event[][]} ensemble the test suite/ensemble to be ranked
-//  * @returns the percentage of goals covered by `ensemble`.
+/**
+ * Ranking function for two-way coverage.
+ * Uses rankByTwoWayCoverage to calculate percentage.
+ *
+ * @param {Event[][]} ensemble The test suite/ensemble to be ranked.
+ * @returns The percentage of two-way coverage achieved.
+ */
+function rankingFunction(ensemble) {
+    return rankByTwoWayCoverage(ensemble);
+}
+
+
+
+//  domain : openCart
+
+// /**
+//  * List of events "of interest" that we want test suites to cover.
 //  */
- function rankingFunction(ensemble) {
-
-    // How many goals did `ensemble` hit?
-    const metGoalsCount = rankByMetGoals(ensemble);
-    // What percentage of the goals did `ensemble` cover?
-    const metGoalsPercent = metGoalsCount/tw.length;
-    return metGoalsPercent * 100; // convert to human-readable percentage
- }
-
+// const domain = [
+//     Event('setup_end'),
+//     Event('ProductAddedToWishlist'),
+//     Event('product_deleted'),
+//     Event('AdminLoggedIn'),
+//     Event('AdminProductsPage'),
+//     Event('ProductAdded'),
+//     Event('UserLoggedIn'),
+//     Event('ProductSearched'),
+//     Event('ProductAddedToWishlist'),  
+// ];
 
 // /**
 //  * Ranks test suites by how many events from the GOALS array were met.
